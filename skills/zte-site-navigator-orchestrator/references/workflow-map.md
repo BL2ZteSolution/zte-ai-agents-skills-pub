@@ -1,0 +1,19 @@
+# Workflow Map
+
+This map defines the Step 0-12 workflow contract for routing only. Detailed validation belongs to standalone step skills.
+
+| step_id | step_key | step_name | category | purpose | required_input | completion_signal | next_step | route_target |
+|---:|---|---|---|---|---|---|---|---|
+| 0 | greeting_status | Greeting and Minimum Site Context Check | mandatory | Greet the user, extract site code/link ID, check minimum site context, and prepare the workflow for check-in. | Sender identity, site reference, role/session context, and compact site facts from available state or fishbone check. | Minimum site context is resolved or missing items are identified. | check_in_report | orchestrator |
+| 1 | check_in_report | Check-in Report | mandatory | Prepare check-in reporting after Step 0 minimum site context is available. | Minimum site context and required check-in details. | Check-in judgement returned and required NOC/Safety drafts are ready for manual forwarding when applicable. | dptw_login | step-check-in |
+| 2 | dptw_login | DPTW Login | mandatory | Confirm permit login status before continuing. | DPTW/CDPTW evidence or system confirmation. | DPTW status is judged by standalone step skill. | ehs_login | step-dptw |
+| 3 | ehs_login | EHS Login | critical | Complete or verify safety compliance login/check. | EHS evidence, safety status, or system confirmation. | EHS status is judged and safety risks are identified. | material_scan | step-ehs |
+| 4 | material_scan | Material Scan | conditional | Confirm MOS/material scan where scope requires it. | Material scan evidence or scope reason for not applicable. | Material status is judged as complete, pending, skipped, or not applicable. | l1_before_photo | step-material-scan |
+| 5 | l1_before_photo | L1 Before Photo | critical | Capture before-work evidence before installation. | Before-work photos and site identifiers. | Photo/evidence judgement returned by step or domain review. | installation | step-l1-before-photo |
+| 6 | installation | Installation | optional | Track physical installation progress. | Installation progress evidence, blockers, or completion note. | Installation progress is judged or blocker is recorded. | integration | step-installation |
+| 7 | integration | Integration | optional | Track commissioning and NMS/integration visibility. | Integration status, commissioning evidence, or blocker details. | Integration status is judged or blocker is recorded. | alarm_check | step-integration |
+| 8 | alarm_check | Alarm Check | critical | Confirm no blocking alarms before leaving site. | Alarm screenshot, NMS status, or approved alarm check result. | Alarm result is judged and critical risks are escalated when needed. | l1_submission | step-alarm-check |
+| 9 | l1_submission | L1 Submission with After Photo | optional | Submit or review after photos and L1 evidence. | After photos, L1 report, submission status. | L1 submission/review judgement returned. | decom_check | step-l1-submission |
+| 10 | decom_check | Decommissioning Check | conditional | Confirm decom requirements when scope includes decommissioning. | Scope/SOW decom requirement and evidence if applicable. | Decom result is judged or marked not applicable. | housekeeping | step-decom |
+| 11 | housekeeping | Housekeeping | critical | Confirm site cleanup and restoration before check-out. | Housekeeping photos or confirmation. | Housekeeping evidence is judged complete or rework is required. | check_out_report | step-housekeeping |
+| 12 | check_out_report | Check-out Report | mandatory | Summarize progress/risks and prepare close-out messages. | Final progress, risks, blockers, checkout context, required site details. | Check-out judgement returned and required NOC/Safety drafts are ready for manual forwarding when applicable. | session_closed | step-check-out |
