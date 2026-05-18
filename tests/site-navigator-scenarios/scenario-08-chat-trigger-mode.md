@@ -29,16 +29,17 @@ I have arrived site ABC123
 
 ## Expected Routing
 
-- route_to: `greeting_status`
-- required_action: resolve minimum site context before check-in routing
+- route_to: `step-greeting-status`
+- required_action: `call_step_greeting_status`
 - system_actions: include `read_firebase_state` and `check_iepms_fishbone_data` when minimum site context is not already provided
 
 ## Expected Decision Behavior
 
 - Orchestrator checks site context/state before state patch intent.
 - Orchestrator identifies arrival intent and starts at Step 0 `greeting_status`.
+- Orchestrator routes Step 0 to `step-greeting-status`.
 - Orchestrator uses compact fishbone facts as the default minimum site context source when needed.
-- Orchestrator routes to `step-check-in` only after minimum site context is available.
+- Orchestrator routes to `step-check-in` only after minimum arrival context is sufficient.
 - `step-check-in` is not selected directly from the initial chat message.
 
 ## Guardrail Checks
@@ -56,7 +57,9 @@ I have arrived site ABC123
 
 - [ ] OpenClaw chat selection target is `zte-site-navigator-orchestrator`.
 - [ ] Direct chat selection target is not `step-check-in`.
-- [ ] Initial orchestrator route target is `greeting_status`.
-- [ ] Step 1 `call_step_check_in` occurs only after minimum site context is available.
+- [ ] Direct chat selection target is not `step-greeting-status`.
+- [ ] Initial orchestrator route target is `step-greeting-status`.
+- [ ] Required action is `call_step_greeting_status`.
+- [ ] Step 1 `call_step_check_in` occurs only after minimum arrival context is sufficient.
 - [ ] Output follows `output-format.md`.
 - [ ] The chat-trigger policy is respected.

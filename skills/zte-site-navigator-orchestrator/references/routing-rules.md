@@ -7,9 +7,9 @@ The orchestrator must:
 - Determine user intent from the latest message and available compact context.
 - Determine the current workflow step from state, step evidence, or user-provided site/session facts.
 - Decide whether to answer directly, route to a standalone step skill, route to an approved system skill action, route to a domain review skill, or ask for missing information.
-- Route arrival messages through Step 0 `greeting_status` first unless minimum site context is already available.
+- Route arrival/start-session/greeting messages through `step-greeting-status` via `call_step_greeting_status`.
 - Route DPTW-related input to `step-dptw`.
-- Route check-in input to `step-check-in` only after minimum site context is available.
+- Route check-in input to `step-check-in` only after minimum arrival context is available.
 - Route alarm-related input to `step-alarm-check`.
 - Route check-out input to `step-check-out`.
 - Route L1, EHS, and PAC report review requests to domain review skills.
@@ -46,9 +46,9 @@ Core rule: 先查后写，先判后推。
 
 | Input / Intent | Route Target | Required Result Before Next Step |
 |---|---|---|
-| Greeting, site status, unclear message | `orchestrator`, `read_firebase_state`, or `check_iepms_fishbone_data` | Sender/site/session/minimum site context resolved or missing items returned |
-| Arrival with site code/link ID | `greeting_status` via orchestrator | Minimum site context checked before Step 1 |
-| Check-in report with minimum site context already available | `step-check-in` via `call_step_check_in` | Check-in judgement and message draft readiness |
+| Greeting, site status, unclear message | `step-greeting-status` via `call_step_greeting_status`, plus system action if needed | Sender/site/session/minimum arrival context resolved or missing items returned |
+| Arrival with site code/link ID | `step-greeting-status` via `call_step_greeting_status` | Minimum arrival context checked before Step 1 |
+| Check-in report with minimum arrival context already available | `step-check-in` via `call_step_check_in` | Check-in judgement and message draft readiness |
 | DPTW/CDPTW login | `step-dptw` via `call_step_dptw` | DPTW judgement |
 | EHS login or safety check | `step-ehs` via `call_step_ehs` | EHS judgement |
 | Material scan or MOS | `step-material-scan` via `call_step_material_scan` | Material judgement |
@@ -155,7 +155,7 @@ Routing boundary:
 
 ## Check-in Routing Rule
 
-If the user message mentions any of these check-in signals and minimum site context is already available, route to `step-check-in` with action `call_step_check_in`:
+If the user message mentions any of these check-in signals and minimum arrival context is already available, route to `step-check-in` with action `call_step_check_in`:
 - check in
 - check-in
 - arrival report
@@ -167,7 +167,7 @@ If the message is an arrival greeting, apply the Arrival Greeting Rule first.
 
 ## Arrival Greeting Rule
 
-If the user says they arrived, reached, or are at site with a site code/link ID, route first to Step 0 `greeting_status`, not directly to `step-check-in`.
+If the user says they arrived, reached, or are at site with a site code/link ID, route first to `step-greeting-status` with action `call_step_greeting_status`, not directly to `step-check-in`.
 
 Arrival trigger examples:
 - arrived site SITE-100
@@ -178,12 +178,14 @@ Arrival trigger examples:
 - site team arrived SITE-100
 
 Step 0 required action:
-- Extract the site code/link ID from the message.
-- Check existing state for compact site context.
+- Route Step 0 judgement to `step-greeting-status`.
+- Pass extracted site code/link ID if available.
+- Pass compact state or fishbone facts if already available.
+- Collect minimum arrival context: `arrival_time`, `team_or_subcon_pic`, and `access_or_safety_issue_status`.
 - If minimum context is missing, request `check_iepms_fishbone_data` from `iepms-fishbone-data-checker`.
 - Use compact fishbone facts only; do not store or expose raw iEPMS response.
 
-Proceed to `check_in_report` only when minimum site context is available. If site code/link ID is missing or fishbone facts cannot resolve the site, remain in `greeting_status` and ask for the missing information.
+Proceed to `check_in_report` only when `step-greeting-status` returns a result that allows progression and minimum arrival context is available. If site code/link ID or minimum arrival context is missing, remain in `greeting_status` and ask for the missing information.
 
 ## Alarm Check Routing Rule
 

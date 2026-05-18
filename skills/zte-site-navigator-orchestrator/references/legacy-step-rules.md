@@ -51,7 +51,7 @@ skip_rule: Not skippable.
 
 risk_rule: If the site cannot be identified or current state cannot be checked, do not proceed; return Pending or Manual Check Required.
 
-backend_or_system_dependency: `firebase-db` for session/state lookup; `iepms-fishbone-data-checker` as the default compact site context source when state context is missing.
+backend_or_system_dependency: Future `step-greeting-status`; `firebase-db` for session/state lookup; `iepms-fishbone-data-checker` as the default compact site context source when state context is missing.
 
 fallback_decision_rule: Proceed to check-in only after minimum site context is known or explicitly provided; otherwise request missing site/session information.
 

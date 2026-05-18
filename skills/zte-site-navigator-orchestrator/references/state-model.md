@@ -106,6 +106,9 @@ Optional compact guidance for `site_data.minimum_context`:
   "site_id": "",
   "project_code": "",
   "scope": "",
+  "arrival_time": "",
+  "team_or_subcon_pic": "",
+  "access_or_safety_issue_status": "",
   "region": "",
   "site_name": "",
   "source": "state | iepms-fishbone-data-checker",
@@ -115,7 +118,7 @@ Optional compact guidance for `site_data.minimum_context`:
 
 Rules:
 - Store compact fields only.
-- Use Step 0 `greeting_status` to resolve this context before Step 1 check-in when the user sends an arrival message.
+- Use Step 0 `greeting_status` through `step-greeting-status` to resolve this context before Step 1 check-in when the user sends an arrival message.
 - `iepms-fishbone-data-checker` may provide the default compact source for this object.
 - Do not store raw iEPMS response, raw fishbone payload, credentials, backend URLs, or full API output.
 

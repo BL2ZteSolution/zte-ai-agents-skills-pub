@@ -10,6 +10,7 @@
 
 | Step ID | Step Key | Skill | Path | Action | Next Step |
 |---:|---|---|---|---|---|
+| 0 | `greeting_status` | `step-greeting-status` | `skills/step-greeting-status/` | `call_step_greeting_status` | `check_in_report` |
 | 1 | `check_in_report` | `step-check-in` | `skills/step-check-in/` | `call_step_check_in` | `dptw_login` |
 | 2 | `dptw_login` | `step-dptw` | `skills/step-dptw/` | `call_step_dptw` | `ehs_login` |
 | 3 | `ehs_login` | `step-ehs` | `skills/step-ehs/` | `call_step_ehs` | `material_scan` |
@@ -39,7 +40,7 @@
 | File | Purpose |
 |---|---|
 | `workflow-map.md` | Canonical Step 0-12 mapping. |
-| `greeting-status-policy.md` | Step 0 arrival greeting and minimum site context rules before check-in. |
+| `greeting-status-policy.md` | Step 0 arrival greeting and minimum arrival context rules before check-in. |
 | `state-model.md` | Canonical Firebase state, event, log, job, dashboard, risk, and cache schemas. |
 | `routing-rules.md` | Intent routing rules for orchestrator, step skills, domain review skills, and system actions. |
 | `result-status.md` | Approved step result statuses and transition meaning. |

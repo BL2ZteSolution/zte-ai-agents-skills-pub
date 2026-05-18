@@ -19,7 +19,7 @@ Do not build one heavy guidebook skill. Use an orchestrator plus small step skil
 
 | Step | Step Key | Route Target | Next Step |
 |---:|---|---|---|
-| 0 | `greeting_status` | `orchestrator` | `check_in_report` |
+| 0 | `greeting_status` | `step-greeting-status` | `check_in_report` |
 | 1 | `check_in_report` | `step-check-in` | `dptw_login` |
 | 2 | `dptw_login` | `step-dptw` | `ehs_login` |
 | 3 | `ehs_login` | `step-ehs` | `material_scan` |

@@ -21,7 +21,8 @@ Use this checklist after contract changes to confirm Phase 11 scenario expectati
 ## Routing and Action Mapping
 
 - [ ] Arrival messages with site code/link ID start at `greeting_status`.
-- [ ] Step 0 resolves minimum site context before routing to `check_in_report`.
+- [ ] `greeting_status` routes to `step-greeting-status` through `call_step_greeting_status`.
+- [ ] Step 0 resolves minimum arrival context before routing to `check_in_report`.
 - [ ] Step 0 uses `check_iepms_fishbone_data` as default minimum context source when compact state context is missing.
 - [ ] `check_in_report` routes to `step-check-in` through `call_step_check_in`.
 - [ ] `dptw_login` routes to `step-dptw` through `call_step_dptw`.

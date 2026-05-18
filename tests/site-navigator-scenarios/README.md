@@ -48,7 +48,7 @@ Run the scenarios as review checklists against the orchestrator, step skill, dom
 
 | Scenario | Focus | Expected Primary Route |
 |---|---|---|
-| 01 | Normal arrival to check-in progression | `greeting_status` then `step-check-in` |
+| 01 | Normal arrival to check-in progression | `step-greeting-status` then `step-check-in` |
 | 02 | Missing site context | `orchestrator` |
 | 03 | Missing mandatory DPTW | `step-dptw` |
 | 04 | Active alarm blocker | `step-alarm-check` |

@@ -14,7 +14,8 @@
 
 ## For Field Workflow
 
-- Check-in: confirm arrival and prepare manual-forward check-in drafts when context is sufficient.
+- Greeting status: greet arrival/start-session messages and collect minimum arrival context before check-in.
+- Check-in: prepare manual-forward check-in drafts when Step 0 context is sufficient.
 - DPTW: verify permit login before workflow continues.
 - EHS: validate safety readiness before site work proceeds.
 - Material scan: confirm MOS/material readiness where required.
@@ -31,7 +32,7 @@
 
 | User Message | Expected Route | Expected Action |
 |---|---|---|
-| "Arrived site 4434A" | `step-check-in` | `call_step_check_in` |
+| "Arrived site 4434A" | `step-greeting-status` | `call_step_greeting_status` |
 | "DPTW done" | `step-dptw` | `call_step_dptw` |
 | "No alarm" | `step-alarm-check` | `call_step_alarm_check` |
 | "Review L1 report" | `l1-report-review` | `review_l1_report` |

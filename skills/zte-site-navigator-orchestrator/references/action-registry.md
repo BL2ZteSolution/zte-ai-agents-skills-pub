@@ -13,7 +13,8 @@ This registry defines future actions only. It does not implement APIs, clients, 
 
 | action_name | future_skill_target | purpose | input_summary | output_summary | decision_boundary |
 |---|---|---|---|---|---|
-| call_step_check_in | step-check-in | Validate whether Step 1 Check-in Report can proceed and prepare exactly two check-in message drafts when context is sufficient. | Current site state, current workflow step, user message, minimum site context, and team/PIC context if available. | Structured check-in judgement with result, missing_items, risk_flags, required_action, next_step, whatsapp_message, message_drafts, and internal_notes. | `step-check-in` validates check-in readiness only. It must not access raw Firebase or iEPMS directly, update state directly, or claim messages were forwarded. |
+| call_step_greeting_status | step-greeting-status | Handle Step 0 Greeting and Minimum Arrival Context Check before check-in. | Current user message, sender/session summary, extracted site_code/link_id, compact state or fishbone facts if available, and any current risk flags. | Structured greeting_status judgement with result, intent, site_code, link_id, minimum_arrival_context, missing_items, risk_flags, required_action, next_step, whatsapp_message, and internal_notes. | `step-greeting-status` validates Step 0 only. It must not access raw Firebase or iEPMS, update systems, generate check-in drafts, or decide later workflow steps. |
+| call_step_check_in | step-check-in | Validate whether Step 1 Check-in Report can proceed and prepare exactly two check-in message drafts when context is sufficient. | Current site state, current workflow step, user message, minimum arrival/site context, and team/PIC context if available. | Structured check-in judgement with result, missing_items, risk_flags, required_action, next_step, whatsapp_message, message_drafts, and internal_notes. | `step-check-in` validates check-in readiness only. It must not access raw Firebase or iEPMS directly, update state directly, or claim messages were forwarded. |
 | call_step_dptw | step-dptw | Validate whether Step 2 DPTW Login can proceed. | Current site state, current workflow step, user message, DPTW evidence summary, and risk context if available. | Structured DPTW judgement with result, missing_items, risk_flags, required_action, next_step, whatsapp_message, and internal_notes. | `step-dptw` validates DPTW readiness only. It must not access raw Firebase or iEPMS directly, update state directly, or decide unrelated workflow steps. |
 | call_step_ehs | step-ehs | Validate whether Step 3 EHS Login can proceed. | Current site state, current workflow step, user message, EHS evidence summary, and safety risk context if available. | Structured EHS judgement with result, missing_items, risk_flags, required_action, next_step, whatsapp_message, and internal_notes. | `step-ehs` validates EHS readiness only and must not perform deep EHS report review. |
 | call_step_material_scan | step-material-scan | Validate whether Step 4 Material Scan can proceed. | Current site state, current workflow step, user message, material/MOS evidence summary, scope context, and compact fishbone facts if available. | Structured material judgement with result, missing_items, risk_flags, required_action, next_step, whatsapp_message, and internal_notes. | `step-material-scan` validates material readiness only and must not update iEPMS directly. |
@@ -30,22 +31,47 @@ This registry defines future actions only. It does not implement APIs, clients, 
 
 These actions route detailed step judgement to the standalone step skill. Step skills validate readiness only; they must not access raw Firebase/iEPMS/TIPIC APIs, update state directly, write iEPMS columns directly, decide unrelated workflow steps, or replace domain review skills. Orchestrator remains final routing and state decision owner.
 
+### call_step_greeting_status
+
+- action_name: `call_step_greeting_status`
+- future_skill_target: `step-greeting-status`
+- purpose: Handle Step 0 Greeting and Minimum Arrival Context Check before check-in.
+- input_summary: Current user message, sender/session summary, extracted `site_code` or `link_id`, compact state or fishbone facts if available, and current risk flags.
+- output_summary: Structured `greeting_status` judgement with result, intent, `site_code`, `link_id`, `minimum_arrival_context`, missing_items, risk_flags, required_action, next_step, whatsapp_message, and internal_notes.
+- allowed_when:
+  - User message concerns greeting, arrival, start session, resume session, site status start, or start-work handoff.
+  - Normal chat has selected `zte-site-navigator-orchestrator`, and the orchestrator is routing Step 0 internally.
+  - The orchestrator has compact context or is asking the skill to identify missing Step 0 context.
+- forbidden_when:
+  - The action would directly access raw Firebase or raw iEPMS.
+  - The action would update Firebase or iEPMS.
+  - The action would generate NOC/Safety check-in drafts.
+  - The action would decide DPTW, EHS, material, alarm, check-out, or unrelated workflow steps.
+  - The action would route a non-Step-0 workflow decision.
+- decision_boundary: `step-greeting-status` validates Step 0 only and returns a compact judgement. It does not own overall workflow routing, system actions, or persistence.
+- guardrails:
+  - Collect or confirm `arrival_time`, `team_or_subcon_pic`, and `access_or_safety_issue_status`.
+  - Extract `site_code` or `link_id` if available.
+  - Return short actionable WhatsApp message only.
+  - Recommend `check_in_report` only when minimum arrival context is sufficient.
+  - Follow 核心原则：先查后写，先判后推。
+
 ### call_step_check_in
 
 - action_name: `call_step_check_in`
 - future_skill_target: `step-check-in`
 - purpose: Validate whether Step 1 Check-in Report can proceed and prepare exactly two check-in message drafts when context is sufficient.
-- input_summary: Current site state, current workflow step, user message, minimum site context, and team/PIC context if available.
+- input_summary: Current site state, current workflow step, user message, minimum arrival/site context, and team/PIC context if available.
 - output_summary: Structured check-in judgement with result, missing_items, risk_flags, required_action, next_step, whatsapp_message, message_drafts, and internal_notes.
 - allowed_when:
   - User message or current workflow step concerns check-in or start-work reporting.
-  - Step 0 `greeting_status` has resolved minimum site context, or equivalent compact context is already available.
+  - Step 0 `greeting_status` has resolved minimum arrival context, or equivalent compact context is already available.
 - forbidden_when:
   - The action would claim messages were already forwarded without user confirmation.
   - The action would update state or external systems directly.
 - decision_boundary: `step-check-in` validates check-in readiness only and prepares drafts only when context is sufficient.
 - guardrails:
-  - Prepare exactly two check-in drafts only when minimum site context is sufficient.
+  - Prepare exactly two check-in drafts only when minimum arrival/site context is sufficient.
   - User must manually forward both drafts.
   - Follow 核心原则：先查后写，先判后推。
 

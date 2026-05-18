@@ -28,6 +28,7 @@ Firebase = State/session/job/dashboard/risk storage
 ```text
 skills/
 ├── zte-site-navigator-orchestrator/
+├── step-greeting-status/
 ├── step-check-in/
 ├── step-dptw/
 ├── step-ehs/
